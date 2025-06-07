@@ -1,0 +1,7 @@
+# Ignore model weights and build artifacts
+llama.cpp/models/*
+llama.cpp/build/*
+__pycache__/
+*.pyc
+.env
+

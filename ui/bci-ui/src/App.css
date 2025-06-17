@@ -4,7 +4,9 @@ html, body {
   height: 100%;
   background-color: #f9f9f9;
   font-family: sans-serif;
+  color: #333; 
 }
+
 
 .outer-container {
   display: flex;
@@ -50,6 +52,7 @@ html, body {
   border: 1px solid #ccc;
   margin-bottom: 0.6rem;
   cursor: pointer;
+  color: #000;
 }
 
 .arrows {
@@ -64,6 +67,7 @@ button {
   cursor: pointer;
   background-color: #fff;
   transition: background-color 0.2s ease;
+  color: #000;
 }
 
 button:hover {
@@ -102,3 +106,8 @@ button:hover {
   gap: 1.2rem;
   margin: 1rem 0;
 }
+
+.display strong {
+  color: #111;
+}
+

@@ -22,7 +22,8 @@ def predict_next_word(prompt, model_path):
         "--top-k", "40",
         "--top-p", "0.95",
         "--repeat-penalty", "1.1",
-        "-no-cnv"
+        "--no-conversation"
+        # "-no-cnv"
     ]
 
     try:

@@ -1,20 +1,16 @@
 import subprocess
 import argparse
 import json
-from nltk.corpus import words
-import nltk
+import os
 
-# Ensure NLTK word list is downloaded
-nltk.download('words', quiet=True)
-word_set = set(w.lower() for w in words.words())
+
 
 LLAMA_BIN = "../../llama.cpp/build/bin/llama-cli"
 DEFAULT_MODEL = "../../llama.cpp/models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf"
 
 print(f"Using LLM binary: {LLAMA_BIN}")
-
+print("Using llama-cli at:", os.path.abspath(LLAMA_BIN))
 def predict_next_word(prompt, model_path):
-    # Reformat prompt to encourage completion naturally
     formatted_prompt = f"Complete this sentence with one likely next word:\n{prompt.strip()}"
 
     cmd = [
@@ -34,29 +30,24 @@ def predict_next_word(prompt, model_path):
         output = result.stdout.strip()
         print("Raw model output:\n", output)
 
-        # Strip everything before the prompt if echoed
         if formatted_prompt in output:
             suffix = output.split(formatted_prompt, 1)[-1].strip()
         else:
             suffix = output.strip()
 
-        # Token filtering
         tokens = suffix.split()
+        predictions = []
         for token in tokens:
             cleaned = ''.join(c for c in token if c.isalpha()).lower()
-            if cleaned in word_set:
-                return [cleaned]
+            if cleaned and cleaned not in predictions:
+                predictions.append(cleaned)
+            if len(predictions) == 3:
+                break
 
-        # Fallback: return first alphabetic token if present
-        for token in tokens:
-            cleaned = ''.join(c for c in token if c.isalpha()).lower()
-            if cleaned:
-                return [cleaned]
+        return predictions if predictions else ["[No valid prediction]"]
 
-        return ["[No valid prediction]"]
     except Exception as e:
         return [f"[LLM Error: {e}]"]
-
 
 def main():
     parser = argparse.ArgumentParser()
@@ -67,10 +58,9 @@ def main():
     text = args.text.strip()
     model = args.model
 
-    next_word = predict_next_word(text, model)
-
+    next_words = predict_next_word(text, model)
     result = {
-        "next_word_prediction": next_word
+        "next_word_prediction": next_words
     }
 
     print(json.dumps(result, indent=2))

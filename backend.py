@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from autocomplete.dictionary_completion.smart_autocomplete import get_predictions as get_completions
 import subprocess
 import os
+import re
 
 app = FastAPI()
 
@@ -32,13 +33,13 @@ def predict_next(req: InputRequest):
     return {"predictions": predictions}
 
 def run_llm_prediction(prompt, model_path):
-    formatted_prompt = f"Complete this sentence with one likely next word:\n{prompt.strip()}"
+    formatted_prompt = f"Complete this sentence with likely next words:\n{prompt.strip()}"
     cmd = [
         "../../llama.cpp/build/bin/llama-cli",
         "-m", model_path,
         "--prompt", formatted_prompt,
-        "--n-predict", "3",
-        "--temp", "0.5",
+        "--n-predict", "20",  # Increased to get more tokens
+        "--temp", "0.7",      # Slightly higher temperature for variety
         "--top-k", "40",
         "--top-p", "0.95",
         "--repeat-penalty", "1.1",
@@ -46,7 +47,7 @@ def run_llm_prediction(prompt, model_path):
     ]
 
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
         output = result.stdout.strip()
 
         if formatted_prompt in output:
@@ -54,11 +55,35 @@ def run_llm_prediction(prompt, model_path):
         else:
             suffix = output.strip()
 
-        tokens = suffix.split()
-        cleaned = [''.join(c for c in tok if c.isalpha()).lower() for tok in tokens]
-        for word in cleaned:
-            if word:
-                return [word]
-        return ["[No valid prediction]"]
+        # Extract words from the output
+        words = re.findall(r'\b[a-zA-Z]+\b', suffix)
+        
+        # Clean and filter words
+        cleaned_words = []
+        for word in words:
+            clean_word = word.lower()
+            if clean_word and len(clean_word) > 1:  # Filter out single letters
+                cleaned_words.append(clean_word)
+        
+        # Remove duplicates while preserving order
+        unique_words = []
+        seen = set()
+        for word in cleaned_words:
+            if word not in seen:
+                unique_words.append(word)
+                seen.add(word)
+        
+        # Return up to 3 predictions
+        if len(unique_words) >= 3:
+            return unique_words[:3]
+        elif len(unique_words) > 0:
+            # Pad with empty strings if we have fewer than 3
+            return unique_words + [""] * (3 - len(unique_words))
+        else:
+            return ["the", "and", "of"]  # Fallback common words
+            
+    except subprocess.TimeoutExpired:
+        return ["the", "and", "of"]  # Fallback on timeout
     except Exception as e:
-        return [f"[LLM Error: {e}]"]
+        print(f"LLM Error: {e}")
+        return ["the", "and", "of"]  # Fallback on error

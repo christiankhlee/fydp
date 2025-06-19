@@ -87,16 +87,35 @@ export default function App() {
         return;
       }
 
-      const last = trimmed.split(" ").pop();
-      const isPartial = /^[a-zA-Z]+$/.test(last);
+      // Check if input ends with space (complete word) or is a partial word
+      const endsWithSpace = input.endsWith(' ');
+      const words = trimmed.split(" ");
+      const lastWord = words[words.length - 1];
+      
+      // Use next-word prediction if:
+      // 1. Input ends with space (just completed a word), OR
+      // 2. Last word is complete (all letters) AND input doesn't end with space but we're at word boundary
+      const shouldPredictNext = endsWithSpace || (lastWord && /^[a-zA-Z]+$/.test(lastWord) && input.endsWith(lastWord + ' '));
+      
+      // Use word completion if we're in the middle of typing a word
+      const isPartialWord = !endsWithSpace && lastWord && /^[a-zA-Z]+$/.test(lastWord);
 
-      const endpoint = isPartial ? "predict_complete" : "predict_next";
+      let endpoint;
+      if (shouldPredictNext) {
+        endpoint = "predict_next";
+      } else if (isPartialWord) {
+        endpoint = "predict_complete";
+      } else {
+        // No predictions for empty input or non-alphabetic characters
+        setPredictions(["", "", ""]);
+        return;
+      }
 
       try {
         const res = await fetch(`http://localhost:8000/${endpoint}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ input }),
+          body: JSON.stringify({ input: trimmed }),
         });
         const data = await res.json();
         setPredictions(data.predictions || ["", "", ""]);
@@ -180,9 +199,19 @@ export default function App() {
     if (cursor.row === -1) {
       const word = predictions[cursor.col];
       if (word) {
-        const words = input.trim().split(" ");
-        words.pop();
-        setInput(words.concat(word).join(" ") + " ");
+        // Handle both word completion and next-word prediction
+        const trimmed = input.trim();
+        const endsWithSpace = input.endsWith(' ');
+        
+        if (endsWithSpace) {
+          // Next-word prediction: just append the word
+          setInput(input + word + ' ');
+        } else {
+          // Word completion: replace the partial word
+          const words = trimmed.split(" ");
+          words.pop(); // Remove partial word
+          setInput(words.concat(word).join(" ") + " ");
+        }
       }
       return;
     }

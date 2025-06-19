@@ -4,6 +4,7 @@ import json
 
 LLAMA_BIN = "../../llama.cpp/build/bin/llama-cli"  # Update this if needed
 MODEL_PATH = "../../llama.cpp/models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf"  # Or your current model
+print("Using llama-cli at:", os.path.abspath(llama_bin))
 
 TEST_PROMPTS = [
     "I want to play",

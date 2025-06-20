@@ -7,13 +7,14 @@ html, body {
   color: #333; 
 }
 
-
 .outer-container {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
   width: 100vw;
+  padding: 6rem 0;
+  box-sizing: border-box;
 }
 
 .speller-container {
@@ -22,15 +23,60 @@ html, body {
   align-items: center;
   width: 90%;
   max-width: 1000px;
+  gap: 1rem;
+}
+
+.input-block {
+  margin-top: 1.5rem;
+  margin-bottom: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .display {
-  margin-bottom: 1rem;
-  font-size: 1.5rem;
+  font-size: 2.5rem;
+  margin-bottom: 0.4rem;
 }
 
-.input-line {
-  margin-bottom: 0.5rem;
+.select-btn {
+  background-color: #e3f5ff;
+  padding: 1rem 2.6rem;
+  font-size: 1.6rem;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  color: #000;
+  margin-top: 0.3rem;
+  margin-bottom: 0.1rem;
+}
+
+.prediction-row {
+  display: flex;
+  justify-content: center;
+  gap: 1.2rem;
+  margin: 0.1rem 0;
+}
+
+.grid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.4rem 0;
+}
+
+.row {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+}
+
+.horizontal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
 }
 
 .cursor {
@@ -42,21 +88,6 @@ html, body {
 @keyframes blink {
   from, to { opacity: 0; }
   50% { opacity: 1; }
-}
-
-.select-btn {
-  background-color: #e3f5ff;
-  padding: 0.7rem 1.6rem;
-  font-size: 1.2rem;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  margin-bottom: 0.6rem;
-  cursor: pointer;
-  color: #000;
-}
-
-.arrows {
-  margin: 0.6rem 0;
 }
 
 button {
@@ -79,35 +110,56 @@ button:hover {
   background-color: #e0f0ff;
 }
 
-.grid {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.6rem;
-  margin: 1rem 0;
-}
-
-.row {
-  display: flex;
-  gap: 0.6rem;
-  justify-content: center;
-}
-
-.horizontal {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1.5rem;
-}
-
-.prediction-row {
-  display: flex;
-  justify-content: center;
-  gap: 1.2rem;
-  margin: 1rem 0;
-}
-
 .display strong {
   color: #111;
 }
 
+.arrows {
+  margin: 0.2rem 0;
+}
+
+.arrow-btn {
+  font-size: 2.5rem;
+  width: 100px;
+  height: 100px;
+  background-color: #ffffff;
+  color: rgb(0, 0, 0);
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  z-index: 1000;
+}
+
+.arrow-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Reposition arrows visually */
+.arrow-btn.left {
+  position: fixed;
+  left: 2%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.arrow-btn.right {
+  position: fixed;
+  right: 2%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.arrow-btn.up {
+  position: fixed;
+  top: 1%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.arrow-btn.down {
+  position: fixed;
+  bottom: 1%;
+  left: 50%;
+  transform: translateX(-50%);
+}

@@ -41,7 +41,8 @@ def predict_next(req: InputRequest):
 # === LLM Runner ===
 def run_llm_prediction(prompt, model_path):
     formatted_prompt = f"Complete this sentence with likely next words:\n{prompt.strip()}"
-
+    # formatted_prompt = f"List 3 likely next words to continue this phrase:\n{prompt.strip()}"
+    
     cmd = [
         "/Users/christian/Documents/fydp/llama.cpp/build/bin/llama-cli",
         "-m", model_path,
@@ -58,8 +59,12 @@ def run_llm_prediction(prompt, model_path):
         logger.info(f"Running LLM with prompt: {formatted_prompt}")
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
         
-        logger.info(f"STDOUT:\n{result.stdout}")
-        logger.info(f"STDERR:\n{result.stderr}")
+        # logger.info(f"STDOUT:\n{result.stdout}")
+        # logger.info(f"STDERR:\n{result.stderr}")
+        # Only log if there's useful info
+        logger.info(f"STDOUT:\n{result.stdout.strip()[:200]}")  # Truncate to 200 chars
+        if result.stderr.strip():
+            logger.warning(f"STDERR (truncated):\n{result.stderr.strip()[:300]}")
 
         output = result.stdout.strip()
 
@@ -68,7 +73,14 @@ def run_llm_prediction(prompt, model_path):
         else:
             suffix = output.strip()
 
-        words = re.findall(r'\b[a-zA-Z]+\b', suffix)
+        # words = re.findall(r'\b[a-zA-Z]+\b', suffix)
+
+
+        if ',' in suffix:
+            words = [w.strip().lower() for w in suffix.split(',') if w.strip().isalpha()]
+        else:
+            words = re.findall(r'\b[a-zA-Z]+\b', suffix)
+
         cleaned_words = []
 
         for word in words:

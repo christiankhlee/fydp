@@ -226,15 +226,17 @@ export default function App() {
   return (
     <div className="outer-container">
       <div className="speller-container">
-        <div className="display">
-          <strong>Input:</strong>
-          <span className="text input-text">{input}<span className="cursor">|</span></span>
+        <div className="input-block">
+          <div className="display">
+            <strong>Input:</strong>
+            <span className="text input-text">{input}<span className="cursor">|</span></span>
+          </div>
+
+          <button className="select-btn" onClick={handleSelect}>Select</button>
         </div>
 
-        <button className="select-btn" onClick={handleSelect}>Select</button>
-
         <div className="arrows">
-          <button onClick={() => handleMove('up')}>↑</button>
+          <button className="arrow-btn up" onClick={() => handleMove('up')}>↑</button>
         </div>
 
         <div className="prediction-row">
@@ -249,7 +251,7 @@ export default function App() {
         </div>
 
         <div className="horizontal">
-          <button onClick={() => handleMove('left')}>←</button>
+          <button className="arrow-btn left" onClick={() => handleMove('left')}>←</button>
 
           <div className="grid">
             {keyGrid.map((row, rowIndex) => (
@@ -269,11 +271,11 @@ export default function App() {
             ))}
           </div>
 
-          <button onClick={() => handleMove('right')}>→</button>
+          <button className="arrow-btn right" onClick={() => handleMove('right')}>→</button>
         </div>
 
         <div className="arrows">
-          <button onClick={() => handleMove('down')}>↓</button>
+          <button className="arrow-btn down" onClick={() => handleMove('down')}>↓</button>
         </div>
       </div>
     </div>
